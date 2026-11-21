@@ -1,4 +1,4 @@
-// Short synthesised sound effects for 2048, Teka Blok and Memori, in the style of Kejar Lapan's
+// Short synthesised sound effects for 2048, Susun Blok and Memori, in the style of Kejar Lapan's
 // (kejar-lapan/js/audio.js): no audio files, so nothing extra to download.
 let ctx = null;
 let muted = false;
@@ -31,7 +31,7 @@ function tone(wave, notes, gain, length, delay = 0) {
 }
 
 /**
- * Teka Blok — pick: a piece is chosen · place: a piece lands · clear: lines clear (`lines`,
+ * Susun Blok — pick: a piece is chosen · place: a piece lands · clear: lines clear (`lines`,
  * `streak` raise the arpeggio) · miss: a piece doesn't fit there.
  * 2048 — slide: tiles move · merge: tiles join (`value`, the biggest new tile, sets the pitch) ·
  * win: 2048 reached.

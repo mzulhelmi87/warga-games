@@ -10,7 +10,7 @@ AppsWarga app (hub repo: `nullifye/arcade`). Static site on GitHub Pages, no bui
 | Duga Kata (5-letter word guess) | [`duga-kata/`](duga-kata/) | https://nullifye.github.io/warga-games/duga-kata/ |
 | Kejar Lapan (3D voxel runner) | [`kejar-lapan/`](kejar-lapan/) | https://nullifye.github.io/warga-games/kejar-lapan/ |
 | 2048 (number merge) | [`2048/`](2048/) | https://nullifye.github.io/warga-games/2048/ |
-| Teka Blok (block puzzle) | [`blok/`](blok/) | https://nullifye.github.io/warga-games/blok/ |
+| Susun Blok (block puzzle) | [`blok/`](blok/) | https://nullifye.github.io/warga-games/blok/ |
 | Memori (memory pairs) | [`memori/`](memori/) | https://nullifye.github.io/warga-games/memori/ |
 
 The site root redirects to the hub. Each game shows its version at the bottom of its home
@@ -37,7 +37,7 @@ One copy for every game; games import it from `../shared/` (or `../../shared/` f
 | `rng.js` | Seeded PRNG, shuffle and Malaysia-time dates, for daily puzzles everyone shares |
 | `base.css` | Tokens, buttons, header, top bar, leaderboard, dialogs, dropdown, toast |
 | `select.js`, `profile-options.js`, `config.js`, `uuid.js`, `reload.js` | Dropdown, user types and campuses, Supabase settings, ids, fresh reload |
-| `puzzle-page.js`, `puzzle-page.css` | The one page shell behind 2048, Teka Blok and Memori (each page sets `<html data-game>`) |
+| `puzzle-page.js`, `puzzle-page.css` | The one page shell behind 2048, Susun Blok and Memori (each page sets `<html data-game>`) |
 | `puzzle-engines.js` | Their rules: `Game2048`, `BlockGame`, `MemoryGame` (unit-tested in `tests/`) |
 | `puzzle-sound.js`, `memory-icons.js` | Their synthesised sound effects, and Memori's card pictures |
 
@@ -71,7 +71,7 @@ The hub keeps its own copies of `appswarga.js`, `select.js`, `profile-options.js
    and an icon in `icons/<id>.svg`.
 
 [`docs/arcade-integration.md`](docs/arcade-integration.md) records the hub and leaderboard setup
-for 2048, Teka Blok and Memori.
+for 2048, Susun Blok and Memori.
 
 ## Score limits
 
@@ -85,7 +85,7 @@ The hub's `supabase/arked.sql` explains each limit; keep it in step with any sco
 | Duga Kata | 2,000 | 1,400 |
 | Kejar Lapan | 100,000 | 300 |
 | 2048 | 100,000 | 500 |
-| Teka Blok | 100,000 | 200 |
+| Susun Blok | 100,000 | 200 |
 | Memori | 100,000 | 500 |
 
 ## Teka Kata
@@ -218,7 +218,7 @@ A three-lane voxel runner through UiTM Shah Alam (Three.js 0.170.0, vendored in
 - Tiles slide, merges pop, and new tiles zoom in from their own cell. Sounds: a swoosh on slides,
   merge blips that rise in pitch with the tile, a fanfare at 2048, a game-over tune.
 
-## Teka Blok
+## Susun Blok
 
 - An 8×8 board and three pieces at a time (no rotation). Drag a piece onto the board, or select
   it and tap a cell (that cell becomes the piece's top-left square). While dragging or hovering,

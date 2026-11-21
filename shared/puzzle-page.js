@@ -20,7 +20,7 @@ const games = {
     'Capai 2048 untuk menang, kemudian terus bermain atau tekan ‹ untuk simpan markah.',
     'Permainan tamat apabila papan penuh dan tiada gerakan lagi. Butang arah boleh disembunyikan di laman utama.',
   ], create: seed => new Game2048(seed) },
-  'blok': { name: 'Teka Blok', help: [
+  'blok': { name: 'Susun Blok', help: [
     'Seret kepingan dari bawah ke papan 8×8. Atau pilih kepingan, kemudian ketik petak: petak itu menjadi sudut kiri atas kepingan.',
     'Bayang hijau menunjukkan tempat kepingan akan diletakkan, merah jika tidak muat. Garisan yang akan dikosongkan bergaris emas.',
     'Kepingan tidak boleh diputar. Setiap petak yang diletakkan memberi 1 mata.',
@@ -43,7 +43,7 @@ let game = null, playedMs = 0, lastTick = 0, lastResult = null, boardTab = 'dail
 let selectedPiece = 0, settleTimer = 0, timer = 0, boardRequest = 0;
 // 2048 tiles by cell, and the slide in progress (its finishing step runs early if another move comes).
 let tileEls = new Map(), slide = null;
-// A Teka Blok line clear in progress, like `slide`.
+// A Susun Blok line clear in progress, like `slide`.
 let clearing = null, overTimer = 0;
 const CLEAR_STEP_MS = 28, CLEAR_MS = 7 * CLEAR_STEP_MS + 320;
 const SLIDE_MS = 110;
@@ -139,7 +139,7 @@ function renderGame(fx = {}) {
   if (!game) return;
   // As in Ular: the score is the title, the game (and its progress) the subtitle.
   $('#game-score').textContent = `${number(game.score)} mata`;
-  // Memori shows its level and Teka Blok its lines cleared; 2048 names the game.
+  // Memori shows its level and Susun Blok its lines cleared; 2048 names the game.
   $('#game-mode').textContent = gameId === 'memori' ? `Tahap ${game.level}` : gameId === 'blok' ? `${number(game.lines)} garisan` : config.name;
   renderTimer();
   const controls = $('#game-controls'), grid = $('#game-grid');
@@ -206,7 +206,7 @@ function move2048(direction) {
 // `fx.board` draws a moment before the final board (full lines still in place); `fx.clearing` maps
 // cells in cleared lines to their sweep delay; `fx.placed` cells pop in; `fx.stuck` marks game over.
 function renderBlock(grid, controls, fx = {}) {
-  grid.classList.add('eight'); grid.classList.toggle('stuck', Boolean(fx.stuck)); grid.setAttribute('aria-label', 'Papan teka blok');
+  grid.classList.add('eight'); grid.classList.toggle('stuck', Boolean(fx.stuck)); grid.setAttribute('aria-label', 'Papan susun blok');
   (fx.board ?? game.board).forEach((value, i) => {
     const cell = h('button', `puzzle-cell${value ? ' filled' : ''}`); cell.type = 'button'; cell.dataset.i = i;
     if (fx.clearing?.has(i)) { cell.classList.add('clearing'); cell.style.setProperty('--d', `${fx.clearing.get(i)}ms`); }
@@ -448,7 +448,7 @@ function init() {
   } else $('#help-text').textContent = config.help;
   initFromArked(); initAppsWarga(); initProfile();
   const help = () => $('#dlg-help').showModal(); $('#btn-help').addEventListener('click', help); $('#help-close').addEventListener('click', () => $('#dlg-help').close());
-  // Teka Blok: hovering the board with a mouse previews the selected piece; drags follow the pointer.
+  // Susun Blok: hovering the board with a mouse previews the selected piece; drags follow the pointer.
   $('#game-grid').addEventListener('pointermove', event => { if (gameId === 'blok' && !drag && event.pointerType === 'mouse') showPreview(selectedPiece, cellAt(event.clientX, event.clientY)); });
   $('#game-grid').addEventListener('pointerleave', () => { if (!drag) clearPreview(); });
   document.addEventListener('pointermove', moveDrag);
