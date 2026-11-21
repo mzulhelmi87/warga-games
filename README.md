@@ -9,22 +9,23 @@ AppsWarga app (hub repo: `nullifye/arcade`). Static site on GitHub Pages, no bui
 | Ular (snake) | [`ular/`](ular/) | https://nullifye.github.io/warga-games/ular/ |
 | Duga Kata (5-letter word guess) | [`duga-kata/`](duga-kata/) | https://nullifye.github.io/warga-games/duga-kata/ |
 | Kejar Lapan (3D voxel runner) | [`kejar-lapan/`](kejar-lapan/) | https://nullifye.github.io/warga-games/kejar-lapan/ |
-| 2048 | [`2048/`](2048/) | https://nullifye.github.io/warga-games/2048/ |
-| Teka Blok | [`blok/`](blok/) | https://nullifye.github.io/warga-games/blok/ |
-| Memori | [`memori/`](memori/) | https://nullifye.github.io/warga-games/memori/ |
+| 2048 (number merge) | [`2048/`](2048/) | https://nullifye.github.io/warga-games/2048/ |
+| Teka Blok (block puzzle) | [`blok/`](blok/) | https://nullifye.github.io/warga-games/blok/ |
+| Memori (memory pairs) | [`memori/`](memori/) | https://nullifye.github.io/warga-games/memori/ |
 
-The site root redirects to the hub.
+The site root redirects to the hub. Each game shows its version at the bottom of its home
+screen (tap it for a fresh reload); bump it when the game changes.
 
 ## Run locally
 
 ```sh
 npm run serve   # http://localhost:8080/warga-games/ular/  (the hub at /arcade/ from ../arked)
-npm test        # node --test: shared/, teka-kata/, ular/, duga-kata/, kejar-lapan/
+npm test        # node --test on tests/*.test.mjs and every game's */tests/*.test.mjs
 ```
 
 ## Shared code (`shared/`)
 
-One copy for every game; games import it with `../../shared/…`.
+One copy for every game; games import it from `../shared/` (or `../../shared/` from `js/`).
 
 | File | What |
 |---|---|
@@ -36,23 +37,68 @@ One copy for every game; games import it with `../../shared/…`.
 | `rng.js` | Seeded PRNG, shuffle and Malaysia-time dates, for daily puzzles everyone shares |
 | `base.css` | Tokens, buttons, header, top bar, leaderboard, dialogs, dropdown, toast |
 | `select.js`, `profile-options.js`, `config.js`, `uuid.js`, `reload.js` | Dropdown, user types and campuses, Supabase settings, ids, fresh reload |
+| `puzzle-page.js`, `puzzle-page.css` | The one page shell behind 2048, Teka Blok and Memori (each page sets `<html data-game>`) |
+| `puzzle-engines.js` | Their rules: `Game2048`, `BlockGame`, `MemoryGame` (unit-tested in `tests/`) |
+| `puzzle-sound.js`, `memory-icons.js` | Their synthesised sound effects, and Memori's card pictures |
 
 The hub keeps its own copies of `appswarga.js`, `select.js`, `profile-options.js`,
 `config.js` and `shared-store.js`; change both when they change.
 
+## Conventions every game follows
+
+- **Screens and history.** Each game routes on the URL hash (`#/main`, `#/tamat`, `#/papan`…).
+  A screen above home is pushed, so the phone's Back returns home; going home steps back
+  instead of pushing, and the result screen replaces the game screen. So no game entry is left
+  under home, and ‹ back to Arked never passes through (or flashes) the game screen. Use the
+  game's `go()` helper rather than setting `location.hash`.
+- **Leaving mid-round** with points ends the round and records it; with no points it is dropped.
+- **Settings** use the same switches and words everywhere: **Bunyi** ("Kesan bunyi" / "Senyap")
+  and **Butang arah** ("Butang arah di skrin" / "Leret sahaja").
+- **Help** (Cara Bermain) is a short numbered list.
+- **Reduced motion** turns animations off.
+
 ## Adding a game
 
 1. Make a folder (e.g. `kuiz/`) with `index.html` linking `../shared/base.css`; see `ular/` for
-   the profile chip, dialog, ‹ button and board markup.
+   the profile chip, dialog, ‹ button and board markup. A simple puzzle can reuse the puzzle
+   shell instead: copy `2048/index.html`, set `data-game`, and add its rules and config.
 2. In its script: `initFromArked()`, `initAppsWarga()`, `initProfile()`; write
    `arked.game.<id>` when a round starts; send each round with `recordRound()`; show boards
    with `topPlayers()` / `topCampuses()`.
-3. Supabase (hub repo `supabase/arked.sql`): add the game to `arked_games` with its point bounds.
-4. Hub: add it to `js/games.js` with `url: 'https://nullifye.github.io/warga-games/<folder>/'`.
+3. Supabase (hub repo `supabase/arked.sql`): add the game to `arked_games` with its point bounds,
+   explaining in a comment how they follow from the rules.
+4. Hub: add it to `js/games.js` with `url: 'https://nullifye.github.io/warga-games/<folder>/'`
+   and an icon in `icons/<id>.svg`.
 
-The three PlayZone game ports use one shared static page shell and rules in `shared/puzzle-page.js`,
-`shared/puzzle-page.css` and `shared/puzzle-engines.js`. Their hub and leaderboard setup is
-documented in [`docs/arcade-integration.md`](docs/arcade-integration.md).
+[`docs/arcade-integration.md`](docs/arcade-integration.md) records the hub and leaderboard setup
+for 2048, Teka Blok and Memori.
+
+## Score limits
+
+`arked_record` rejects a round above `max_points`, or above `max_points_per_sec` × its seconds.
+The hub's `supabase/arked.sql` explains each limit; keep it in step with any scoring change.
+
+| Game | Max points | Max per second |
+|---|---|---|
+| Teka Kata | 6,000 | 6,000 |
+| Ular | 6,000 | 75 |
+| Duga Kata | 2,000 | 1,400 |
+| Kejar Lapan | 100,000 | 300 |
+| 2048 | 100,000 | 500 |
+| Teka Blok | 100,000 | 200 |
+| Memori | 100,000 | 500 |
+
+## Teka Kata
+
+- A cryptogram: every letter of a phrase is a number, and the same letter always has the same
+  number. Some letters start revealed; tap a blank and type a letter, and ◀ ▶ move between blanks.
+- 133 phrases in three categories (UiTM, Malaysia, Peribahasa), in `teka-kata/js/phrases.js`.
+- **Cabaran Harian**: the same phrase for everyone, new at midnight Malaysia time, walking a
+  fixed shuffle so phrases don't repeat until the list is used up. Its clock keeps running if you
+  leave. **Main Bebas**: random phrases, avoiding ones already solved on this device.
+- Three mistakes end the round. Score: 50 a hidden letter plus 10 a second saved under
+  8 seconds a letter, × 100 / 70 / 40 % for 0 / 1 / 2 mistakes.
+- Rules in `teka-kata/js/game.js`, score in `score.js` (both unit-tested).
 
 ## Ular
 
@@ -79,107 +125,121 @@ documented in [`docs/arcade-integration.md`](docs/arcade-integration.md).
 
 ## Kejar Lapan
 
-- Each of the nine campus scenery types has an original 90-second retro game score
-  with its own tempo (64–160 BPM), key, groove and instrumentation. Songs loop and crossfade, follow
-  the sound toggle, and stop on pause, results or navigation. Listen to all tracks at
-  [`kejar-lapan/music.html`](kejar-lapan/music.html).
-  Boost plays music at 1.35× speed with pitch preserved. Shield adds short stereo
-  room reverb and softens high frequencies on music and sound effects; both effects
-  clear when the corresponding power-up ends, and reset on pause or mute.
-  Regenerate the MP3s and catalog with `python3 tools/compose-kejar-music.py`
-  (requires NumPy and FFmpeg; no build step is needed to play the game). Tracks are 72 kbps
-  MP3s (about 0.7 MB each), and only the current area's track is loaded. The shield room
-  reverb is only connected while the shield is active.
+A three-lane voxel runner through UiTM Shah Alam (Three.js 0.170.0, vendored in
+`kejar-lapan/vendor/` with its licence; no CDN, no build step).
 
-- HUD, touch controls and overlays respect both browser safe areas and AppsWarga's native
-  inset variables, including the legacy `--appswarga-safe-top`. This keeps the timer below
-  iPhone notches/Dynamic Island and controls clear of the home indicator and landscape cutouts.
-  Insets are combined with `max()`, so they are not counted twice. The 3D scene stays edge to edge.
+**Play**
 
-- A three-lane voxel runner through UiTM Shah Alam (Three.js 0.170.0, vendored in
-  `kejar-lapan/vendor/` with its licence; no CDN, no build step).
-- The campus clock runs from 07:55 to 8:00. After the starting gate, the fourteen campus
-  landmarks repeat as checkpoints that add time: +16 s, one
-  less each time, at least +8 s. Crash or reach 8:00 and the run ends.
-- **Harian** (default): Pelajar, Staf, Alumni and Awam each receive a different daily
-  checkpoint destination. Each day picks four neighbouring checkpoints from PTAR onwards
-  (1.44–7.84 km) and shuffles them between the roles, so the longest route that day is at most
-  about twice the shortest while route length still varies from day to day. Destinations and seeded courses stay fixed for that user type all day and refresh at
-  midnight Malaysia time. Arrive before 8:00 to win; the finish awards checkpoint points
-  but no extra clock time. Saved Tepat Masa selections now open Harian.
-- **Larian Jauh**: run as far as possible on a random course before crashing or running
-  out of time; there is no fixed destination or distance cap.
-- **Bayang rekod**: optional translucent replay of the best attempt on the same route, stored
-  locally on this device. Completed runs rank by fastest finish, then score; unfinished runs
-  rank by furthest distance, then score. Sparse inputs replay at fixed simulation ticks; pauses
-  do not advance the ghost, which cannot collide with the player or take their items. Only the
-  latest daily record for each user type is retained separately. Course identities are
-  versioned in `js/modes.js`; bump `COURSE_VERSION` after physics, tuning or generation changes.
-  The existing leaderboards continue to aggregate scores from all modes.
-- **Almari Gaya**: eighteen local milestone rewards across backpacks, outfits, running trails,
-  and accessories. Single-run distance goals are 12 km (robe), 5 km (glasses) and 10 km (stars),
-  verified against actual simulated runs. Game-count rewards require 100/150/300/500 completed games; arrival rewards require 50/100 successful arrivals. Earn rewards through completed games, best single-run distance, cumulative distance, active
-  play time (60/120/240 minutes), checkpoints, successful arrivals and collected items;
-  existing run counts and distance records count too. Equip one unlocked item per body position (head, face, body, back, hand, foot effects),
-  or keep the original look. All roles and modes share progress on this device; selections
-  survive reloads and new unlocks appear on the result screen. The rotating live wardrobe preview
-  shows the same models as the game: pink round and cat-face bags; fire, stars, rainbow and
-  flying-frost trails; glasses, floating golden halo, helmet, brimmed hat, full-face mask, handheld star wand, briefcase, trident, jetpack and crossed back
-  katanas. Body rewards are a wide-sleeved shinigami-style robe and a pocketed expedition vest,
-  with distinct torso and sleeve geometry in both the avatar and isolated cards. Saved beard
-  selections become the full-face mask; old body item IDs remain valid with the new milestone thresholds. Headwear replaces default hats, the wand replaces default handheld props, and katanas
-  share the back slot with bags, so only one back item is equipped. Existing cosmetic IDs are preserved; removed sling-bag selections fall back to the original look. Cosmetics only reach the renderer:
-  speed, jumps, collision bounds, power-ups, scores and replay rules remain identical. Trails
-  use the same fixed mesh emitter in-game and in the wardrobe (geometry, lifetime and animation).
-  The wardrobe keeps its avatar on a round pedestal and views equipped trails from behind,
-  at the same world size and spacing as the game, with no compression or cropping of emitter samples; reduced motion hides effects in both views. Option cards show isolated cosmetic
-  models with no character in compact 48 px thumbnails, using one shared thumbnail renderer rather than a WebGL context per card.
-  Rotation buttons show arrow icons and retain accessible labels.
-  The role mission and item labels sit between the role choices and avatar preview, which remains visible while switching
-  between **Mod Permainan** and **Almari Gaya** tabs. New players start with all 18 rewards locked;
-  locked cards show only a generic question-mark image and milestone progress, revealing the item
-  name and model after earning it. Previously saved test equipment cannot bypass these requirements.
-  Folder-shaped tabs and beveled inventory cards use a bare pixel question mark; equipped cards
-  show a corner checkmark. The wardrobe displays totals for games, distance, minutes, checkpoints,
-  arrivals and pickups. New cumulative counters start from zero for existing profiles, since older
-  saves did not record them; existing game counts and best distances are retained. Completed runs
-  record simulation seconds, so pause time, menus and background time do not count.
-  A hidden rotation code (left, right, right, left, left, left, right within ten seconds) unlocks
-  all cosmetics for the current page session only, without changing stats or scores. Reloading
-  or closing the page restores normal milestone access; old persistent cheat flags are ignored.
-  Backgrounding or leaving home resets partial input. `COSMETICS_TEST_UNLOCK` remains `false`; milestones live in `js/cosmetics.js`.
+- The campus clock runs from 07:55 to 8:00. After the starting gate (Pintu Utama), fourteen
+  campus landmarks repeat as checkpoints that add time: +16 s, one less each time, at least
+  +8 s. Crash or reach 8:00 and the run ends.
 - Lompat (jump) kon, lubang, monyet; tunduk (slide) under palang; go round bas and kereta.
-  Swipe, arrow keys / WASD / Space, or the on-screen buttons (a setting).
-- The character comes from the profile (Pelajar, Staf, Alumni, Awam) and can be switched; items
-  only change look: points (+25), boost (5 s, smashes obstacles), shield (10 active seconds or one hit; refreshes on pickup, blinks and fades during the final 3 seconds), jam (+5 s).
-  Every 12 obstacle rows, one guaranteed +5 s clock appears in a seeded random lane.
-  It must be collected in that lane; missing it grants no time. A minimum 60 m support gap
-  leaves room to steer in and back out, even while boosted. This replaces that gap's random items,
-  while other gaps retain their usual pickups. The clock start/cap and checkpoint bonuses are
-  unchanged. A clock-seeking test player clears 12 km on all 30 audited endless seeds using real pickups
-  and ordinary controls; ignoring clocks runs out of time before the goal.
-  Course identity is now `kl-5`, so earlier ghost recordings are ignored after the route change;
-  achievement progress and best-distance stats remain intact.
-- The avatar card also has an image-share icon in its top-right corner. It exports the
-  current role, equipped cosmetics, player name and personal totals (best score, best distance,
-  active play time, completed games), without requiring a run. Images refresh after equipment,
-  role, profile or progress changes; rapid changes are coalesced and stale renders discarded.
-- **Kongsi** exports a vertical 1080×1350 PNG game card with a chamfered gold frame and single action-figure portrait with the run's captured player name,
-  equipped avatar in one three-quarter action pose, outcome, mode, campus clock, score, distance, duration and
-  checkpoints. The image is prepared before the button tap for native file sharing; browsers
-  without image sharing download the PNG. Cancelling the share sheet does not download anything.
-  Inside AppsWarga, sharing uses the native `share` handler with pre-encoded PNG `image` and
-  `imageType`, including Android WebViews without browser file sharing. Outside the app, it uses
-  Web Share files or a PNG download fallback. `js/share-card.js` owns
-  rendering and delivery, and temporary portrait rendering releases its WebGL resources.
-  Both card footers use the player's saved campus, omitted for public/non-UiTM or missing-campus
-  profiles. Both share buttons show a spinner and busy state while preparing the PNG or awaiting
-  the native share promise, then reset after success, cancellation or failure.
-  UI buttons activate once on a touch/pen release and suppress the delayed compatibility click;
-  scrolling, cancelled gestures and the game D-pad are excluded, with normal mouse/keyboard input retained.
+  Swipe, arrow keys / WASD / Space, or the on-screen buttons (**Butang arah**).
+- Items: points (+25), boost (5 s, smashes obstacles), shield (10 active seconds or one hit;
+  refreshes on pickup, blinks and fades in its last 3 seconds), jam (+5 s). Every 12 obstacle
+  rows, one guaranteed +5 s clock appears in a seeded lane with a 60 m gap to steer in and out,
+  even while boosted; missing it grants nothing. A clock-seeking test player clears 12 km on all
+  30 audited endless seeds; ignoring clocks runs out of time first.
+- The character comes from the profile (Pelajar, Staf, Alumni, Awam) and can be switched;
+  items only change look.
 - Score: a point a metre, plus items, plus 200 a checkpoint; every run with points goes to
-  `arked_record` (at most 100,000 points and 300 a second). Distance shows in m, then km.
+  `arked_record`. Distance shows in m, then km.
+
+**Modes**
+
+- **Harian** (default): Pelajar, Staf, Alumni and Awam each get a different daily destination.
+  Each day picks four neighbouring checkpoints from PTAR onwards (1.44–7.84 km) and shuffles them
+  between the roles, so the longest route that day is at most about twice the shortest.
+  Destinations and seeded courses stay fixed for that user type all day and refresh at midnight
+  Malaysia time. Arrive before 8:00 to win; the finish awards checkpoint points but no extra
+  time. Saved Tepat Masa selections open Harian.
+- **Larian Jauh**: run as far as possible on a random course; no destination or distance cap.
+- **Bayang rekod**: an optional translucent replay of the best attempt on the same route, stored
+  on this device (the latest daily record for each user type). Finished runs rank by fastest
+  finish, unfinished ones by furthest distance, then score. The ghost replays sparse inputs at
+  fixed simulation ticks, doesn't advance while paused, and can't collide or take items.
+- Course identities are versioned in `js/modes.js` (now `kl-8`); bump `COURSE_VERSION` after
+  physics, tuning or generation changes, which retires older ghosts. Leaderboards add up all modes.
+
+**Almari Gaya (wardrobe)**
+
+- Eighteen milestone rewards on this device, shared by all roles and modes: backpacks, outfits,
+  trails and accessories, one per body position (head, face, body, back, hand, foot effects),
+  or the original look. Milestones live in `js/cosmetics.js`:
+  - single-run distance: 5 km (glasses), 10 km (stars trail), 12 km (robe);
+  - completed games: 100 / 150 / 300 / 500; successful arrivals: 50 / 100;
+  - active play time: 60 / 120 / 240 minutes; plus cumulative distance, checkpoints and items.
+- New players start with all 18 locked; a locked card shows a question mark and its progress.
+  Totals for games, distance, minutes, checkpoints, arrivals and pickups are shown; completed runs
+  record simulation seconds, so pauses, menus and background time don't count.
+- Cosmetics only reach the renderer: speed, jumps, collisions, power-ups, scores and replays are
+  unchanged. Headwear replaces default hats, the wand replaces handheld props, and katanas share
+  the back slot with bags. The rotating preview and the 48 px cards use the same models as the
+  game (one shared thumbnail renderer); trails use the same mesh emitter; reduced motion hides
+  effects.
+- A hidden rotation code (left, right, right, left, left, left, right within ten seconds)
+  unlocks every cosmetic for this page session only, without touching stats or scores.
+  `COSMETICS_TEST_UNLOCK` stays `false`.
+
+**Sharing**
+
+- **Kongsi** exports a 1080×1350 PNG card of the run (player, equipped avatar in an action pose,
+  outcome, mode, campus clock, score, distance, time, checkpoints); the avatar card's share icon
+  exports the player's totals without a run. Inside AppsWarga the native `share` handler gets a
+  pre-encoded PNG; elsewhere Web Share files or a PNG download. Footers show the player's
+  campus (omitted for public or non-UiTM profiles). `js/share-card.js` owns rendering and delivery.
+
+**Sound and screen**
+
+- Each of the nine scenery types has an original 90-second retro score (64–160 BPM) that loops
+  and crossfades, follows **Bunyi**, and stops on pause, results or navigation. Boost plays it at
+  1.35× with pitch preserved; the shield adds a short room reverb (only connected while
+  shielded). Tracks are 72 kbps MP3s (about 0.7 MB each); only the current area's loads. Listen
+  at [`kejar-lapan/music.html`](kejar-lapan/music.html); regenerate with
+  `python3 tools/compose-kejar-music.py` (NumPy and FFmpeg).
+- The HUD, controls and overlays respect browser safe areas and AppsWarga's inset variables
+  (including the legacy `--appswarga-safe-top`), combined with `max()`; the 3D scene stays edge
+  to edge. Buttons fire once on touch release without the delayed compatibility click.
+
+**Code**
+
 - `js/sim.js` (fixed 60 Hz steps, swept collision) and `js/course.js` (seeded rows that always
   leave a way through) are pure and unit-tested, including a bot that clears 4 km of 30 courses.
   `js/render.js` draws the sim's state with merged voxel models and pools, so memory stays flat.
 - Tuning lives in `js/config.js`. `?debug` exposes `window.__kl` for browser tests.
+
+## 2048
+
+- Slide all tiles with a swipe, the arrow keys or the on-screen D-pad (**Butang arah**, placed
+  like Ular's). Equal tiles merge, adding the new tile's value to the score; each move adds a 2
+  (90 %) or a 4. Reach 2048, then keep going or press ‹ to save. The round ends when no move is
+  left.
+- The header shows the score and the time played; the move count sits above the board.
+- Tiles slide, merges pop, and new tiles zoom in from their own cell. Sounds: a swoosh on slides,
+  merge blips that rise in pitch with the tile, a fanfare at 2048, a game-over tune.
+
+## Teka Blok
+
+- An 8×8 board and three pieces at a time (no rotation). Drag a piece onto the board, or select
+  it and tap a cell (that cell becomes the piece's top-left square). While dragging or hovering,
+  the landing cells show green (fits) or red (doesn't), and lines it would clear get a gold ring.
+- Score: 1 a cell, 10 a cleared row or column, +10 for each extra line cleared at once, and a
+  combo bonus of +5 per earlier clear in a streak of clearing placements (at most +50). A greedy
+  player averages about 7 points a placement (tested under 20).
+- Full lines flash gold and sweep away while their cells stay; placed blocks pop in. Pieces with
+  no room anywhere fade out. With no room left, the board shakes and dims ("Tiada ruang lagi!")
+  before the result. Sounds for picking, placing, clearing (longer and higher with combos), a
+  failed drop and game over, with a **Bunyi** switch.
+
+## Memori
+
+- Turn two cards to find a pair; clear every pair to go up a level. Level 1 has 4 pairs and one
+  more each level, up to 12 pairs (24 cards) at level 9; after that the cards stay at 24 and the
+  time limit shrinks by 2 s every 4 levels, down to 25 s. There is no last level.
+- Score: 100 a pair, −10 for each miss in the level (not below 0), and +50 × the level for
+  clearing it.
+- Cards turn over in 3D; a found pair turns green; a cleared level stays face up for a moment
+  (clock paused). While a wrong pair shows, tapping a third card turns it back at once.
+- The 12 pictures are UiTM campus objects drawn as SVG (`shared/memory-icons.js`), so they look
+  the same on iOS and Android. Sounds for flips, pairs, misses, levels, the last five seconds and
+  time up, with a **Bunyi** switch.
