@@ -125,8 +125,8 @@ function renderGame(fx = {}) {
   if (!game) return;
   // As in Ular: the score is the title, the game (and its progress) the subtitle.
   $('#game-score').textContent = `${number(game.score)} mata`;
-  // Memori's subtitle is just its level; the others name the game (Teka Blok adds its lines).
-  $('#game-mode').textContent = gameId === 'memori' ? `Tahap ${game.level}` : gameId === 'blok' ? `${config.name} · ${number(game.lines)} garisan` : config.name;
+  // Memori shows its level and Teka Blok its lines cleared; 2048 names the game.
+  $('#game-mode').textContent = gameId === 'memori' ? `Tahap ${game.level}` : gameId === 'blok' ? `${number(game.lines)} garisan` : config.name;
   renderTimer();
   const controls = $('#game-controls'), grid = $('#game-grid');
   // Memori keeps its cards between renders so they can flip; it deals a new set per level itself.

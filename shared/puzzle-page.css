@@ -113,13 +113,18 @@ html.from-arked .profile-chip { margin-right: auto; }
 #game-controls { align-self: stretch; display: flex; flex-direction: column; align-items: center; gap: 12px; }
 
 /* ---------- Teka Blok effects ---------- */
-/* Placed blocks pop in; blocks in a full line flash gold, swell, then shrink away in a sweep. */
+/* Placed blocks pop in. In a full line, the cell stays an empty white box while its block, drawn on
+   top, flashes gold, swells, then shrinks away in a sweep along the line. */
 .puzzle-grid.eight .puzzle-cell.placed { animation: block-place 180ms ease-out; }
-.puzzle-grid.eight .puzzle-cell.clearing { animation: line-clear 320ms ease-in var(--d, 0ms) forwards; }
+.puzzle-grid.eight .puzzle-cell.clearing { position: relative; background: var(--surface); border-color: var(--line); }
+.puzzle-grid.eight .puzzle-cell.clearing::after {
+  content: ''; position: absolute; inset: -1px; border-radius: inherit; background: var(--primary);
+  animation: line-clear 320ms ease-in var(--d, 0ms) forwards;
+}
 @keyframes block-place { from { scale: 0.6; } }
 @keyframes line-clear {
-  30% { scale: 1.12; background: var(--gold); border-color: var(--gold); }
-  to { scale: 0.2; opacity: 0; background: var(--gold); border-color: var(--gold); }
+  30% { scale: 1.12; background: var(--gold); }
+  to { scale: 0.2; opacity: 0; background: var(--gold); }
 }
 /* Preview where the piece would land: green fits, red doesn't; lines it would clear get a gold ring. */
 .puzzle-grid.eight .puzzle-cell.preview-ok { background: color-mix(in srgb, var(--primary) 45%, var(--surface)); border-color: var(--primary); }
@@ -137,5 +142,5 @@ html.from-arked .profile-chip { margin-right: auto; }
 .puzzle-grid.stuck .puzzle-cell.filled { filter: grayscale(0.7); opacity: 0.6; transition: opacity 0.4s, filter 0.4s; }
 @keyframes board-stuck { 20%, 60% { translate: -6px 0; } 40%, 80% { translate: 6px 0; } }
 @media (prefers-reduced-motion: reduce) {
-  .puzzle-grid.eight .puzzle-cell.placed, .puzzle-grid.eight .puzzle-cell.clearing, .puzzle-grid.stuck { animation: none; }
+  .puzzle-grid.eight .puzzle-cell.placed, .puzzle-grid.eight .puzzle-cell.clearing::after, .puzzle-grid.stuck { animation: none; }
 }
