@@ -9,6 +9,9 @@ AppsWarga app (hub repo: `nullifye/arcade`). Static site on GitHub Pages, no bui
 | Ular (snake) | [`ular/`](ular/) | https://nullifye.github.io/warga-games/ular/ |
 | Duga Kata (5-letter word guess) | [`duga-kata/`](duga-kata/) | https://nullifye.github.io/warga-games/duga-kata/ |
 | Kejar Lapan (3D voxel runner) | [`kejar-lapan/`](kejar-lapan/) | https://nullifye.github.io/warga-games/kejar-lapan/ |
+| 2048 | [`2048/`](2048/) | https://nullifye.github.io/warga-games/2048/ |
+| Teka Blok | [`blok/`](blok/) | https://nullifye.github.io/warga-games/blok/ |
+| Memori | [`memori/`](memori/) | https://nullifye.github.io/warga-games/memori/ |
 
 The site root redirects to the hub.
 
@@ -46,6 +49,10 @@ The hub keeps its own copies of `appswarga.js`, `select.js`, `profile-options.js
    with `topPlayers()` / `topCampuses()`.
 3. Supabase (hub repo `supabase/arked.sql`): add the game to `arked_games` with its point bounds.
 4. Hub: add it to `js/games.js` with `url: 'https://nullifye.github.io/warga-games/<folder>/'`.
+
+The three PlayZone game ports use one shared static page shell and rules in `shared/puzzle-page.js`,
+`shared/puzzle-page.css` and `shared/puzzle-engines.js`. Their hub and leaderboard setup is
+documented in [`docs/arcade-integration.md`](docs/arcade-integration.md).
 
 ## Ular
 

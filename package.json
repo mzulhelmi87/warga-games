@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Games for Arked Warga (AppsWarga, UiTM): Teka Kata, Ular, Duga Kata, Kejar Lapan and more. Static site, no build step.",
   "scripts": {
-    "test": "node --test tests/ teka-kata/tests/ ular/tests/ duga-kata/tests/ kejar-lapan/tests/",
+    "test": "node --test 'tests/*.test.mjs' '*/tests/*.test.mjs'",
     "serve": "node tools/dev-server.mjs 8080"
   }
 }

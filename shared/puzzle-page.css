@@ -1,0 +1,141 @@
+/* 2048, Teka Blok and Memori. Builds on ../shared/base.css; the home screen matches the other games. */
+
+/* ---------- back to Arked (shared/arked-link.js) ---------- */
+#btn-close-app,
+#btn-hub { display: none; }
+html.in-appswarga #btn-close-app,
+html.from-arked #btn-hub { display: grid; }
+/* Opened from Arked Warga: people leave AppsWarga from the hub, so no ✕ here. */
+html.from-arked #btn-close-app { display: none; }
+html.from-arked .profile-chip { margin-right: auto; }
+
+/* ---------- home ---------- */
+.screen-home > .btn { margin-top: 12px; }
+.puzzle-brand { text-align: center; margin: 22px 0 18px; animation: rise 0.4s both ease-out; }
+.puzzle-brand img { display: block; margin: 0 auto 10px; border-radius: 20px; box-shadow: var(--shadow); }
+.puzzle-brand h1 { font-size: clamp(2rem, 9vw, 2.6rem); line-height: 1.05; margin: 0; font-weight: 800; letter-spacing: -0.02em; }
+.puzzle-brand p { color: var(--ink-2); margin: 8px auto 0; max-width: 30ch; }
+.puzzle-home-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 12px; }
+.puzzle-home-stats div { background: color-mix(in srgb, var(--surface) 60%, transparent); border-radius: 14px; padding: 10px 6px; text-align: center; }
+.puzzle-home-stats dt { font-size: 0.72rem; color: var(--ink-2); }
+.puzzle-home-stats dd { margin: 2px 0 0; font-weight: 800; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.screen-home .app-version { margin-top: auto; padding-top: 20px; }
+/* Settings card with flat toggles, as in Ular. */
+.puzzle-settings { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.switch-row { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0; background: none; text-align: left; min-height: 60px; }
+.switch-row + .switch-row { border-top: 1px solid var(--track); }
+.switch-text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.switch-text small { color: var(--ink-2); font-size: 0.78rem; }
+.switch { flex: none; position: relative; width: 50px; height: 30px; border-radius: 999px; background: var(--key-off); transition: background 0.2s; }
+.switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15); transition: transform 0.2s; }
+.switch-row[aria-checked='true'] .switch { background: var(--primary); }
+.switch-row[aria-checked='true'] .switch::after { transform: translateX(20px); }
+
+/* ---------- game, result ---------- */
+.puzzle-result .res-icon { display: block; margin: 0 auto 8px; border-radius: 18px; box-shadow: var(--shadow); }
+.puzzle-actions { display:grid; gap:14px; margin-top:20px; }
+.puzzle-stage { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:16px 0 28px; }
+.puzzle-status { align-self: stretch; margin: 0; min-height: 1.5em; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+.puzzle-grid { width:min(100%,400px); display:grid; gap:8px; padding:10px; border-radius:18px; background:var(--surface-2); border:1px solid var(--line); touch-action:none; }
+.puzzle-grid.four { grid-template-columns:repeat(4,minmax(0,1fr)); }.puzzle-grid.eight { grid-template-columns:repeat(8,minmax(0,1fr)); gap:3px; padding:7px; }
+.puzzle-cell { display:grid; place-items:center; aspect-ratio:1; min-width:0; padding:0; border:1px solid var(--line); border-radius:10px; background:var(--surface); color:var(--ink); font-size:clamp(1rem,6vw,2rem); font-weight:800; }
+.puzzle-grid.eight .puzzle-cell { border-radius:4px; font-size:0; }.puzzle-cell.filled { background:var(--primary); border-color:var(--primary); color:var(--primary-ink); }
+.puzzle-grid .puzzle-cell:disabled { opacity:1; cursor:default; }
+.puzzle-cell[data-value='2'],.puzzle-cell[data-value='4'] { background:var(--surface); }.puzzle-cell[data-value='8'],.puzzle-cell[data-value='16'],.puzzle-cell[data-value='32'] { background:var(--gold-2); color:var(--gold-ink); }.puzzle-cell[data-value='64'],.puzzle-cell[data-value='128'],.puzzle-cell[data-value='256'],.puzzle-cell[data-value='512'],.puzzle-cell[data-value='1024'],.puzzle-cell[data-value='2048'] { background:var(--primary); color:var(--primary-ink); }
+/* D-pad, as in Ular: flat-3D keys laid out like a keyboard's arrow keys. */
+.dpad { flex: none; display: grid; grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(2, 58px); grid-template-areas: '. up .' 'left down right'; gap: 17px; justify-content: center; padding-bottom: 36px; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.dpad-btn { border: 0; border-radius: 16px; background: var(--key); color: var(--key-ink); box-shadow: 0 4px 0 var(--line); display: grid; place-items: center; transition: transform 0.06s, box-shadow 0.06s; }
+.dpad-btn svg { width: 26px; height: 26px; }
+.dpad-btn.up { grid-area: up; } .dpad-btn.down { grid-area: down; } .dpad-btn.left { grid-area: left; } .dpad-btn.right { grid-area: right; }
+.dpad-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--line); }
+/* 2048 with the D-pad, as in Ular: a full-height screen with the board centred between the bar and
+   the D-pad, which sits at the bottom. The board shrinks on short screens instead of scrolling. */
+.screen-game.with-dpad { height: 100dvh; min-height: 0; overflow: hidden; }
+.screen-game.with-dpad .puzzle-stage { padding-bottom: 0; gap: 12px; }
+.screen-game.with-dpad .puzzle-status { margin-top: auto; }
+.screen-game.with-dpad .puzzle-grid { margin-bottom: auto; width: min(100%, 400px, calc(100dvh - 320px)); }
+/* Short phones: a smaller D-pad so the board keeps its room. */
+@media (max-height: 700px) { .dpad { grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(2, 48px); padding-bottom: 16px; } }
+.puzzle-tray { display:flex; width:min(100%,400px); gap:10px; }.puzzle-piece { flex:1 1 0; min-width:0; padding:0; height:72px; display:grid; place-items:center; }.puzzle-piece[aria-pressed='true'] { outline:3px solid var(--gold); }.piece-mini { position:relative; width:46px; height:46px; }.piece-mini i { position:absolute; width:13px; height:13px; border-radius:3px; background:var(--primary); }
+.puzzle-result { margin:auto 0; text-align:center; }.puzzle-result h2 { font-size:2rem; }.puzzle-result .score { color:var(--primary); font-size:3rem; font-weight:800; margin:10px 0; }.puzzle-result p { color:var(--muted); }
+.puzzle-result .puzzle-actions { margin:30px 0; }
+.puzzle-grid.memory { grid-template-columns:repeat(4,minmax(0,1fr)); }.puzzle-grid.memory.wide { grid-template-columns:repeat(6,minmax(0,1fr)); }.puzzle-grid.memory .puzzle-cell { aspect-ratio:.85; }
+
+/* ---------- 2048 tiles ---------- */
+/* Slots are the faint board; tiles ride on a layer above, positioned by row/column so they can slide. */
+.puzzle-grid.four { position: relative; }
+.puzzle-grid.four .slot { background: color-mix(in srgb, var(--surface) 45%, transparent); border-color: transparent; }
+.tile-layer { position: absolute; inset: 10px; pointer-events: none; }
+.puzzle-cell.tile {
+  position: absolute; left: 0; top: 0; width: calc((100% - 24px) / 4);
+  /* `translate` (not `transform`) so the `scale` effects below grow from the tile's own centre. */
+  translate: calc(var(--c) * (100% + 8px)) calc(var(--r) * (100% + 8px));
+  transition: translate 110ms ease-out; box-shadow: 0 3px 0 var(--line);
+}
+.puzzle-cell.tile[data-digits='3'] { font-size: clamp(0.95rem, 5.2vw, 1.6rem); }
+.puzzle-cell.tile[data-digits='4'] { font-size: clamp(0.85rem, 4.4vw, 1.3rem); }
+.puzzle-cell.tile[data-digits='5'], .puzzle-cell.tile[data-digits='6'] { font-size: clamp(0.75rem, 3.6vw, 1.05rem); }
+.puzzle-cell.tile[data-digits='4']:not([data-value='1024']):not([data-value='2048']),
+.puzzle-cell.tile[data-digits='5'], .puzzle-cell.tile[data-digits='6'] { background: var(--ink); color: var(--surface); }
+/* `scale` animates separately from the sliding `translate`, around the tile's centre. */
+.puzzle-cell.tile.merged { animation: tile-pop 160ms ease-out; z-index: 1; }
+.puzzle-cell.tile.spawned { animation: tile-grow 200ms ease-out; }
+@keyframes tile-pop { 50% { scale: 1.15; } }
+/* New tile: zooms in from a dot at its cell's centre, overshooting slightly before settling. */
+@keyframes tile-grow { from { scale: 0; opacity: 0; } 70% { scale: 1.08; opacity: 1; } to { scale: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .puzzle-cell.tile { transition: none; }
+  .puzzle-cell.tile.merged, .puzzle-cell.tile.spawned { animation: none; }
+}
+
+/* ---------- Memori cards ---------- */
+/* A two-sided card: the purple back faces up; flipping turns it over in 3D to the picture. */
+.puzzle-grid.memory .puzzle-cell.card,
+.puzzle-grid.memory .puzzle-cell.card.matched { padding: 0; border: 0; background: none; box-shadow: none; perspective: 700px; }
+.card-inner { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 320ms ease; }
+.card.flipped .card-inner { transform: rotateY(180deg); }
+.card-face { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 10px; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 3px 0 var(--line); }
+.card-back { background: var(--primary) radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.2), transparent 60%); color: var(--primary-ink); font-size: clamp(1.1rem, 6vw, 1.8rem); font-weight: 800; }
+/* Always a white face (dark mode too), so every picture's colours show the same everywhere. */
+.card-front { background: #fff; border: 1px solid var(--line); transform: rotateY(180deg); }
+.card-front svg { width: 72%; height: auto; }
+/* A found pair turns green and gives a small hop once it has turned over. */
+.card.matched .card-front { background: color-mix(in srgb, var(--ok) 22%, #fff); border-color: var(--ok); }
+.card.matched { animation: card-match 260ms 300ms ease-out; }
+@keyframes card-match { 50% { scale: 1.08; } }
+@media (prefers-reduced-motion: reduce) {
+  .card-inner { transition: none; }
+  .card.matched { animation: none; }
+}
+
+/* The controls area spans the stage, so the Teka Blok tray matches the board's width and its three
+   slots keep one fixed size whether they hold a piece or a used ✓. */
+#game-controls { align-self: stretch; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
+/* ---------- Teka Blok effects ---------- */
+/* Placed blocks pop in; blocks in a full line flash gold, swell, then shrink away in a sweep. */
+.puzzle-grid.eight .puzzle-cell.placed { animation: block-place 180ms ease-out; }
+.puzzle-grid.eight .puzzle-cell.clearing { animation: line-clear 320ms ease-in var(--d, 0ms) forwards; }
+@keyframes block-place { from { scale: 0.6; } }
+@keyframes line-clear {
+  30% { scale: 1.12; background: var(--gold); border-color: var(--gold); }
+  to { scale: 0.2; opacity: 0; background: var(--gold); border-color: var(--gold); }
+}
+/* Preview where the piece would land: green fits, red doesn't; lines it would clear get a gold ring. */
+.puzzle-grid.eight .puzzle-cell.preview-ok { background: color-mix(in srgb, var(--primary) 45%, var(--surface)); border-color: var(--primary); }
+.puzzle-grid.eight .puzzle-cell.preview-bad { background: color-mix(in srgb, #e03131 35%, var(--surface)); border-color: #e03131; }
+.puzzle-grid.eight .puzzle-cell.preview-line { box-shadow: inset 0 0 0 2px var(--gold); }
+/* Pieces with no room anywhere on the board fade out. */
+.puzzle-piece.no-fit { opacity: 0.35; }
+.puzzle-piece { touch-action: none; user-select: none; -webkit-user-select: none; }
+/* The piece being dragged floats above the finger at board size. */
+.piece-mini.drag-ghost { position: fixed; left: 0; top: 0; z-index: 50; pointer-events: none; opacity: 0.9; filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.25)); }
+.piece-mini.drag-ghost i { border-radius: 5px; transition: background 0.1s; }
+.piece-mini.drag-ghost.bad i { background: #e03131; }
+/* No room left: the board shakes once and dims before the result. */
+.puzzle-grid.stuck { animation: board-stuck 420ms ease-in-out; }
+.puzzle-grid.stuck .puzzle-cell.filled { filter: grayscale(0.7); opacity: 0.6; transition: opacity 0.4s, filter 0.4s; }
+@keyframes board-stuck { 20%, 60% { translate: -6px 0; } 40%, 80% { translate: 6px 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .puzzle-grid.eight .puzzle-cell.placed, .puzzle-grid.eight .puzzle-cell.clearing, .puzzle-grid.stuck { animation: none; }
+}
