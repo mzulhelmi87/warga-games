@@ -59,7 +59,21 @@ function storeGet(key, fallback) { try { return JSON.parse(localStorage.getItem(
 function storeSet(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* unavailable */ } }
 function h(tag, className, content) { const node = document.createElement(tag); if (className) node.className = className; if (content !== undefined) node.textContent = content; return node; }
 function show(name) { for (const screen of screens) $(`#screen-${screen}`).hidden = screen !== name; document.body.dataset.screen = name; }
-function go(name) { const hash = `#/${name}`; if (location.hash === hash) route(); else location.hash = hash; }
+// History follows the screens: a screen above home (game, result, board) is pushed, so the phone's
+// Back returns home; going home steps back instead of pushing, so no gameplay entry is left under
+// home. Going back to Arked then never passes through the game screen (no glimpse of it).
+function go(name, { replace = false } = {}) {
+  const hash = `#/${name}`;
+  if (!name) {
+    if (history.state?.up) return history.back(); // the hashchange then routes home
+    if (location.hash !== hash) history.replaceState({ ...(history.state ?? {}), up: false }, '', hash);
+    return route();
+  }
+  if (location.hash === hash) return route();
+  if (replace) history.replaceState({ ...(history.state ?? {}), up: true }, '', hash);
+  else history.pushState({ up: true }, '', hash);
+  route();
+}
 function stats() { return storeGet(statsKey, { played: 0, best: 0 }); }
 function renderHome() { show('home'); renderSettings(); const s = stats(); $('#st-best').textContent = number(s.best); $('#st-played').textContent = s.played; }
 function route() {
@@ -67,7 +81,7 @@ function route() {
   if (name === 'main') {
     if (game && !game.over) return show('game');
     // Back from the result lands on #/main with a finished round: go home, not to a dead board.
-    if (game?.over) { game = null; history.replaceState(null, '', '#/'); return renderHome(); }
+    if (game?.over) { game = null; history.replaceState({ ...(history.state ?? {}), up: false }, '', '#/'); return renderHome(); }
     return withProfile(startGame);
   }
   if (overTimer) { clearTimeout(overTimer); overTimer = 0; return finish('full'); }
@@ -391,7 +405,8 @@ function finish(reason = 'manual') {
   lastResult = result;
   const s = stats(); s.played++; s.best = Math.max(s.best, result.score); storeSet(statsKey, s);
   appsWargaHaptic('notification', result.score > 0 ? 'success' : 'warning');
-  submitResult(result); go('tamat');
+  // The result takes the game screen's place, so Back from it goes home, not to the old round.
+  submitResult(result); go('tamat', { replace: location.hash === '#/main' });
 }
 function renderResult() {
   const r = lastResult; show('result'); $('#res-title').textContent = r.reason === 'timeout' ? 'Masa Tamat' : 'Pusingan Tamat'; $('#res-detail').textContent = r.detail; $('#res-score').textContent = number(r.score); $('#res-time').textContent = `Masa ${lb.formatDuration(r.seconds)}`; renderSubmit();
@@ -443,7 +458,7 @@ function init() {
   $('#set-sound')?.addEventListener('click', () => toggleSetting('sound'));
   $('#btn-hub').addEventListener('click', backToArked); $('#btn-close-app').addEventListener('click', closeMiniApp); $('#btn-version').addEventListener('click', hardReload);
   $('#btn-play').addEventListener('click', () => go('main')); $('#btn-board').addEventListener('click', () => go('papan')); $('#btn-quit').addEventListener('click', () => go(''));
-  $('#res-home').addEventListener('click', () => go('')); $('#res-again').addEventListener('click', () => { game = null; go('main'); }); $('#res-board').addEventListener('click', () => { boardTab = 'alltime'; go('papan'); });
+  $('#res-home').addEventListener('click', () => go('')); $('#res-again').addEventListener('click', () => { game = null; go('main', { replace: true }); }); $('#res-board').addEventListener('click', () => { boardTab = 'alltime'; go('papan'); });
   $('#btn-board-back').addEventListener('click', () => go('')); $('#btn-board-refresh').addEventListener('click', () => loadTab(boardTab)); for (const button of document.querySelectorAll('.tabs [data-tab]')) button.addEventListener('click', () => setTab(button.dataset.tab));
   document.addEventListener('keydown', event => { if (gameId !== '2048' || document.body.dataset.screen !== 'game' || document.querySelector('dialog[open]')) return; const dir = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' }[event.key]; if (dir) { event.preventDefault(); move2048(dir); } });
   let touch = null; $('#game-grid').addEventListener('pointerdown', event => { if (gameId !== '2048') return; touch = { x: event.clientX, y: event.clientY }; try { event.currentTarget.setPointerCapture(event.pointerId); } catch { /* pointer already gone */ } }); $('#game-grid').addEventListener('pointercancel', () => { touch = null; }); $('#game-grid').addEventListener('pointerup', event => { if (!touch || gameId !== '2048') return; const dx = event.clientX - touch.x, dy = event.clientY - touch.y; touch = null; if (Math.max(Math.abs(dx), Math.abs(dy)) >= 24) move2048(Math.abs(dx) > Math.abs(dy) ? dx > 0 ? 'right' : 'left' : dy > 0 ? 'down' : 'up'); });

@@ -99,11 +99,20 @@ function show(name) {
   document.body.dataset.screen = name;
 }
 
+// History follows the screens: a screen above home is pushed (marked `up`), so the phone's Back
+// returns home; going home steps back over it instead of pushing, so no game entry is left under
+// home and going back to Arked never passes through (or flashes) the game screen.
 function go(path, replace = false) {
   const target = `#/${path}`;
-  if (location.hash === target) route();
-  else if (replace) location.replace(target);
-  else location.hash = target;
+  if (!path) {
+    if (history.state?.up) return history.back(); // the hashchange then routes home
+    if (location.hash !== target) history.replaceState({ ...(history.state ?? {}), up: false }, '', target);
+    return route();
+  }
+  if (location.hash === target) return route();
+  if (replace) history.replaceState({ ...(history.state ?? {}), up: true }, '', target);
+  else history.pushState({ up: true }, '', target);
+  route();
 }
 
 function route() {
