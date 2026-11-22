@@ -1,6 +1,5 @@
 /* Warga Games: shared base styles (tokens, buttons, header, profile chip, top bar,
-   leaderboard, dialogs, dropdown, toast). New games link this first, then their own CSS.
-   Copied from Teka Kata, whose own css/style.css still holds the same rules.
+   leaderboard, dialogs, dropdown, toast). Every game links this first, then its own CSS.
    Inside AppsWarga, shared/appswarga.js replaces the theme-derived tokens with the user's
    theme and forces light mode (data-theme="light"), as AppsWarga itself is light-only. */
 :root {
@@ -693,13 +692,26 @@ html.appswarga-fullscreen.aw-close-visible .screen {
 
 /* ---------- top bar ---------- */
 .bar {
-  display: flex;
+  /* Three columns with equal sides, so the title sits in the true centre even when the right
+     side (a 64px timer) is wider than the 44px back button. A long title still ellipsises. */
+  display: grid;
+  grid-template-columns: 1fr minmax(0, auto) 1fr;
+  justify-items: start;
   align-items: center;
   gap: 10px;
 }
 
+.bar > .bar-mid {
+  grid-column: 2;
+  justify-self: stretch;
+}
+
+.bar > :last-child:not(:first-child):not(.bar-mid) {
+  grid-column: 3;
+  justify-self: end;
+}
+
 .bar-mid {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;

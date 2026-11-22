@@ -24,6 +24,7 @@
     ],
     "teka-kata": [
       "teka-kata/",
+      "shared/base.css",
       "teka-kata/css/style.css",
       "shared/theme-boot.js",
       "teka-kata/js/main.js",
