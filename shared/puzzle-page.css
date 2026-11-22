@@ -59,7 +59,7 @@ html.from-arked .profile-chip { margin-right: auto; }
 .puzzle-tray { display:flex; width:min(100%,400px); gap:10px; }.puzzle-piece { flex:1 1 0; min-width:0; padding:0; height:72px; display:grid; place-items:center; }.puzzle-piece[aria-pressed='true'] { outline:3px solid var(--gold); }.piece-mini { position:relative; width:46px; height:46px; }.piece-mini i { position:absolute; width:13px; height:13px; border-radius:3px; background:var(--primary); }
 .puzzle-result { margin:auto 0; text-align:center; }.puzzle-result h2 { font-size:2rem; }.puzzle-result .score { color:var(--primary); font-size:3rem; font-weight:800; margin:10px 0; }.puzzle-result p { color:var(--muted); }
 .puzzle-result .puzzle-actions { margin:30px 0; }
-.puzzle-grid.memory { grid-template-columns:repeat(4,minmax(0,1fr)); }.puzzle-grid.memory.wide { grid-template-columns:repeat(6,minmax(0,1fr)); }.puzzle-grid.memory .puzzle-cell { aspect-ratio:.85; }
+.puzzle-grid.memory { grid-template-columns:repeat(4,minmax(0,1fr)); }.puzzle-grid.memory.wide { grid-template-columns:repeat(5,minmax(0,1fr)); }.puzzle-grid.memory .puzzle-cell { aspect-ratio:.85; }
 
 /* ---------- 2048 tiles ---------- */
 /* Slots are the faint board; tiles ride on a layer above, positioned by row/column so they can slide. */
