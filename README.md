@@ -21,6 +21,7 @@ screen (tap it for a fresh reload); bump it when the game changes.
 ```sh
 npm run serve   # http://localhost:8080/warga-games/ular/  (the hub at /arcade/ from ../arked)
 npm test        # node --test on tests/*.test.mjs and every game's */tests/*.test.mjs
+node tools/preload.mjs   # after changing a game's imports, stylesheets or scripts
 ```
 
 ## Shared code (`shared/`)
@@ -56,6 +57,12 @@ The hub keeps its own copies of `appswarga.js`, `select.js`, `profile-options.js
   and **Butang arah** ("Butang arah di skrin" / "Leret sahaja").
 - **Help** (Cara Bermain) is a short numbered list.
 - **Reduced motion** turns animations off.
+- **Fast start.** The home screen is visible in the HTML (not waiting for the script), and each
+  page lists its modules as `<link rel="modulepreload">` so they download together instead of one
+  import level at a time. `tools/preload.mjs` writes those lists and `preload.json` (each game's
+  files, which the hub fetches into the cache while idle); `npm test` fails if either is stale.
+- **Theme.** `shared/theme-boot.js` applies the last AppsWarga theme before the first paint, and
+  `ready` waits for the theme, so pages never flash the default colours inside AppsWarga.
 
 ## Adding a game
 

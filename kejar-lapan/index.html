@@ -14,12 +14,39 @@
   <link rel="stylesheet" href="../shared/base.css">
   <link rel="stylesheet" href="css/kejar.css">
   <link rel="modulepreload" href="vendor/three.module.min.js">
+  <!-- modulepreload:start (tools/preload.mjs) -->
+  <link rel="modulepreload" href="js/config.js">
+  <link rel="modulepreload" href="js/sim.js">
+  <link rel="modulepreload" href="js/course.js">
+  <link rel="modulepreload" href="../shared/rng.js">
+  <link rel="modulepreload" href="js/campus.js">
+  <link rel="modulepreload" href="js/score.js">
+  <link rel="modulepreload" href="js/touch-buttons.js">
+  <link rel="modulepreload" href="js/input.js">
+  <link rel="modulepreload" href="js/audio.js">
+  <link rel="modulepreload" href="js/music.js">
+  <link rel="modulepreload" href="js/sound-space.js">
+  <link rel="modulepreload" href="../shared/appswarga.js">
+  <link rel="modulepreload" href="../shared/arked-link.js">
+  <link rel="modulepreload" href="../shared/profile.js">
+  <link rel="modulepreload" href="../shared/shared-store.js">
+  <link rel="modulepreload" href="../shared/profile-options.js">
+  <link rel="modulepreload" href="../shared/select.js">
+  <link rel="modulepreload" href="../shared/uuid.js">
+  <link rel="modulepreload" href="../shared/leaderboard.js">
+  <link rel="modulepreload" href="../shared/config.js">
+  <link rel="modulepreload" href="../shared/reload.js">
+  <link rel="modulepreload" href="js/modes.js">
+  <link rel="modulepreload" href="js/replay.js">
+  <link rel="modulepreload" href="js/cosmetics.js">
+  <link rel="modulepreload" href="js/rotation-code.js">
+  <!-- modulepreload:end -->
   <script type="module" src="js/main.js"></script>
 </head>
 <body data-screen="home">
   <div id="app">
     <!-- Laman utama -->
-    <section id="screen-home" class="screen screen-home" hidden>
+    <section id="screen-home" class="screen screen-home">
       <header class="home-head">
         <!-- Only when opened from Arked Warga (html.from-arked): back to the game hub. -->
         <button type="button" class="icon-btn" id="btn-hub" aria-label="Kembali ke Arked Warga">
@@ -123,7 +150,7 @@
         <div><dt>Dimainkan</dt><dd id="st-played">0</dd></div>
       </dl>
 
-      <button type="button" class="app-version" id="btn-version" aria-label="Versi 1.10. Ketik untuk muat semula permainan.">Versi 1.10</button>
+      <button type="button" class="app-version" id="btn-version" aria-label="Versi 1.11. Ketik untuk muat semula permainan.">Versi 1.11</button>
     </section>
 
     <!-- Permainan -->

@@ -12,12 +12,27 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="css/style.css">
+  <!-- modulepreload:start (tools/preload.mjs) -->
+  <link rel="modulepreload" href="js/phrases.js">
+  <link rel="modulepreload" href="js/game.js">
+  <link rel="modulepreload" href="../shared/rng.js">
+  <link rel="modulepreload" href="js/score.js">
+  <link rel="modulepreload" href="js/board.js">
+  <link rel="modulepreload" href="../shared/leaderboard.js">
+  <link rel="modulepreload" href="../shared/config.js">
+  <link rel="modulepreload" href="../shared/profile-options.js">
+  <link rel="modulepreload" href="../shared/select.js">
+  <link rel="modulepreload" href="js/storage.js">
+  <link rel="modulepreload" href="../shared/shared-store.js">
+  <link rel="modulepreload" href="../shared/arked-link.js">
+  <link rel="modulepreload" href="../shared/appswarga.js">
+  <!-- modulepreload:end -->
   <script type="module" src="js/main.js"></script>
 </head>
 <body data-screen="home">
   <div id="app">
     <!-- Laman utama -->
-    <section id="screen-home" class="screen screen-home" hidden>
+    <section id="screen-home" class="screen screen-home">
       <header class="home-head">
         <!-- Only when opened from Arked Warga (html.from-arked): back to the game hub. -->
         <button type="button" class="icon-btn" id="btn-hub" aria-label="Kembali ke Arked Warga">
@@ -77,7 +92,7 @@
         <div><dt>Markah terbaik</dt><dd id="st-best">0</dd></div>
       </dl>
 
-      <button type="button" class="app-version" id="btn-version" aria-label="Versi 1.6. Ketik untuk muat semula permainan.">Versi 1.6</button>
+      <button type="button" class="app-version" id="btn-version" aria-label="Versi 1.7. Ketik untuk muat semula permainan.">Versi 1.7</button>
     </section>
 
     <!-- Permainan -->
