@@ -164,7 +164,7 @@ function endSession() {
 }
 
 function renderScores(st) {
-  $('#game-score').textContent = `Anda ${st.stores[PLAYER]} · ${st.stores[AI]} AI`;
+  $('#game-score').textContent = `Anda ${st.stores[PLAYER]} – ${st.stores[AI]} AI`;
 }
 
 function setStatus(text, who) {
@@ -319,7 +319,8 @@ function renderResult() {
   const r = lastResult;
   show('result');
   $('#res-title').textContent = r.win === PLAYER ? 'Anda Menang!' : r.win === AI ? 'AI Menang' : 'Seri';
-  $('#res-detail').textContent = `Anda ${r.stores[PLAYER]} – ${r.stores[AI]} AI · ${LEVELS[r.level].name}`;
+  $('#res-detail').textContent = `Anda ${r.stores[PLAYER]} – ${r.stores[AI]} AI`;
+  $('#res-level').textContent = `Tahap ${LEVELS[r.level].name}`;
   $('#res-score').textContent = number(r.points);
   $('#res-time').textContent = `Masa ${lb.formatDuration(r.seconds)}`;
   renderSubmit();

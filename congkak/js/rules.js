@@ -2,10 +2,11 @@
 // and the 3D scene only replays the events a move records.
 //
 // Board: 7 holes a side, 7 marbles each (98 in all), and a store (rumah) at each end.
-//   holes 0–6   the player's row, left to right (nearest the player)
-//   holes 7–13  the AI's row, right to left (13 is opposite 0)
-//   14          the player's store, on the right · 15 the AI's store, on the left
-// Sowing goes player's row → player's store → AI's row → AI's store, skipping the opponent's store.
+//   holes 0–6   the player's row, right to left (nearest the player)
+//   holes 7–13  the AI's row, left to right (13 is opposite 0)
+//   14          the player's store, at the left end · 15 the AI's store, at the right end
+// Sowing goes player's row → player's store → AI's row → AI's store (clockwise, seen from the
+// player's side), skipping the opponent's store.
 // Last marble:
 //   in your own store            → you go again;
 //   in a hole that now holds >1  → pick them all up and keep sowing (berjalan);

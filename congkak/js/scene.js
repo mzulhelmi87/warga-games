@@ -19,11 +19,17 @@ const HAND_Y = 1.05; // the hand's height while travelling
 const MARBLE_COLORS = [0x1b7a4a, 0x2f8fd8, 0x16989a, 0x2a4fb5, 0x35b071, 0x1f3f8f, 0x5fb3c9, 0xc8902a];
 const SLEEVE = [0x2f5d9e, 0xa83a2c]; // the player's sleeve, the AI's
 
-/** Where hole or store `i` is on the board (x along the board, z across: the player's row is +z). */
+/**
+ * Where hole or store `i` is on the board (x along the board, z across). The player sits on the
+ * -z side, the AI on the +z side. As traditionally played, sowing runs clockwise: seen from the
+ * player's seat, along their row from right to left into their store at their left end (+x),
+ * then along the AI's row into the AI's store (-x). Hole i and its opposite (13 - i) share x.
+ */
+export const SIDE = [-1, 1]; // z side of the player's row, the AI's
 export function spot(i) {
   if (i === STORE[PLAYER]) return { x: 4.42, z: 0 };
   if (i === STORE[AI]) return { x: -4.42, z: 0 };
-  return { x: (i < 7 ? i : 13 - i) * 1.02 - 3.06, z: i < 7 ? 0.7 : -0.7 };
+  return { x: (i < 7 ? i : 13 - i) * 1.02 - 3.06, z: (i < 7 ? SIDE[PLAYER] : SIDE[AI]) * 0.7 };
 }
 
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
@@ -598,7 +604,7 @@ export function createScene(stage, { onPitTap, sound = () => {}, topInset = () =
   /** Works out every label's point, as seen from `cam` (the overview). */
   function pinLabels(cam) {
     for (let i = 0; i < 14; i++) {
-      const p = spot(i), side = i < 7 ? 1 : -1;
+      const p = spot(i), side = Math.sign(p.z);
       pinOutside(cam, counts[i], p.x, 0, p.x, side * HALF_W);
     }
     STORE.forEach((s, k) => {
@@ -625,6 +631,8 @@ export function createScene(stage, { onPitTap, sound = () => {}, topInset = () =
   // board runs diagonally, its near end (the player's store) larger. On a tall phone screen the
   // view looks more along the board, so it runs up the screen; on a wide one, more across.
   let portrait = true;
+  // From beyond the player's store end (+x): on a tall screen the player's row (-z) runs up the
+  // right side and the AI's up the left, the player's store nearest.
   const DIR_TALL = new THREE.Vector3(0.62, 0.76, 0.2).normalize();
   const DIR_WIDE = new THREE.Vector3(0.42, 0.74, 0.53).normalize();
   // The player can turn the view (swipe or arrow keys): yaw circles round the board, pitch looks
@@ -792,11 +800,12 @@ export function createScene(stage, { onPitTap, sound = () => {}, topInset = () =
 
   // ---------- moves ----------
   const tmp = new THREE.Vector3();
+  let handSide = 1; // z side the hand comes from (its owner's)
   /** The hand glides to above `i`, in an arc when going far. */
   function moveHand(i, seconds = 0.3) {
     const from = hand.position.clone();
     const p = spot(i);
-    const to = new THREE.Vector3(p.x, HAND_Y, p.z + 0.12);
+    const to = new THREE.Vector3(p.x, HAND_Y, p.z + handSide * 0.12);
     const far = from.distanceTo(to);
     return tween(seconds * Math.min(2.2, Math.max(0.7, far / 1.1)), (t) => {
       const e = ease(t);
@@ -867,10 +876,12 @@ export function createScene(stage, { onPitTap, sound = () => {}, topInset = () =
     const alive = () => gen === generation;
     following = follow;
     hand.userData.setSleeve(SLEEVE[player]);
-    hand.rotation.set(hand.userData.pitch, player === AI ? Math.PI : 0, 0);
+    handSide = SIDE[player];
+    // The hand points to -z with its arm to +z: turn it round for an owner on the -z side.
+    hand.rotation.set(hand.userData.pitch, handSide > 0 ? 0 : Math.PI, 0);
     // The hand comes in from its owner's side.
     const first = spot(events[0]?.at ?? 0);
-    hand.position.set(first.x, HAND_Y + 1.2, first.z + (player === AI ? -2.4 : 2.4));
+    hand.position.set(first.x, HAND_Y + 1.2, first.z + handSide * 2.4);
     hand.userData.setCurl(0.6);
     hand.visible = true;
     held.length = 0;
@@ -926,7 +937,7 @@ export function createScene(stage, { onPitTap, sound = () => {}, topInset = () =
     await wait(0.3);
     // The hand leaves towards its owner's side.
     const from = hand.position.clone();
-    await tween(0.35, (t) => { hand.position.set(from.x, lerp(from.y, from.y + 1.4, t), lerp(from.z, from.z + (player === AI ? -2.6 : 2.6), t)); });
+    await tween(0.35, (t) => { hand.position.set(from.x, lerp(from.y, from.y + 1.4, t), lerp(from.z, from.z + handSide * 2.6, t)); });
     hand.visible = false;
     setInHand(0);
     following = false;

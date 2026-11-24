@@ -137,6 +137,10 @@
   background: radial-gradient(circle at 35% 30%, #7fb8f2, #2f7dd6 60%, #1d5aa3);
 }
 
+/* ---------- result ---------- */
+/* The AI level, on its own row under the score line. */
+.puzzle-result .cg-res-level { margin-top: -6px; font-size: 0.9rem; font-weight: 600; }
+
 /* ---------- osom ---------- */
 .cg-osom { text-align: center; width: min(360px, calc(100vw - 32px)); }
 .cg-osom h2 { margin: 0; font-size: 1.9rem; font-weight: 800; letter-spacing: -0.01em; }
