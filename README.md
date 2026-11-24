@@ -12,6 +12,7 @@ AppsWarga app (hub repo: `nullifye/arcade`). Static site on GitHub Pages, no bui
 | 2048 (number merge) | [`2048/`](2048/) | https://nullifye.github.io/warga-games/2048/ |
 | Susun Blok (block puzzle) | [`blok/`](blok/) | https://nullifye.github.io/warga-games/blok/ |
 | Memori (memory pairs) | [`memori/`](memori/) | https://nullifye.github.io/warga-games/memori/ |
+| Congkak (3D, against the AI) | [`congkak/`](congkak/) | https://nullifye.github.io/warga-games/congkak/ |
 
 The site root redirects to the hub. Each game shows its version at the bottom of its home
 screen (tap it for a fresh reload); bump it when the game changes.
@@ -94,6 +95,7 @@ The hub's `supabase/arked.sql` explains each limit; keep it in step with any sco
 | 2048 | 100,000 | 500 |
 | Susun Blok | 100,000 | 200 |
 | Memori | 100,000 | 500 |
+| Congkak | 1,000 | 60 |
 
 ## Teka Kata
 
@@ -250,3 +252,21 @@ A three-lane voxel runner through UiTM Shah Alam (Three.js 0.170.0, vendored in
 - The 12 pictures are UiTM campus objects drawn as SVG (`shared/memory-icons.js`), so they look
   the same on iOS and Android. Sounds for flips, pairs, misses, levels, the last five seconds and
   time up, with a **Bunyi** switch.
+
+## Congkak
+
+- The traditional board against the AI: 7 holes a side with 7 marbles each, a store (rumah) at
+  each end. Osom (batu, gunting, kain) decides who starts. Sowing goes round the board,
+  skipping the opponent's store; the last marble in your own store gives another turn, in a
+  filled hole you pick them all up and carry on, in your own empty hole you capture it and the
+  hole opposite (tembak). The round ends when a row is empty. Rules and the AI are in
+  `congkak/js/rules.js` (unit-tested).
+- AI levels: Mudah plays at random; Sederhana, Susah and Pakar look 1, 2 and 4 moves ahead.
+  Only a win scores: 55–100% of the level's maximum (100, 500, 800, 1,000), more for a fuller
+  store.
+- 3D with Three.js (Kejar Lapan's `vendor/` copy, fetched while the home screen shows): a maroon
+  lacquered board with carved stars and ferns, glass marbles, and a hand that scoops and sows
+  them one by one while the camera follows it. Each hole's and store's count sits beside it,
+  off the board; the marbles in hand show under the status line. Swipe or the arrow keys turn
+  the view (kept between games); ↺ or 0 puts it back. Settings: AI level, camera follow, fast
+  sowing, sound.
